@@ -1,0 +1,310 @@
+:root {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --border: #dfe4ec;
+  --text: #1c2333;
+  --text-muted: #5b667a;
+  --accent: #2962ff;
+  --accent-hover: #1e4fd6;
+}
+
+[data-theme="dark"] {
+  --bg: #0e1117;
+  --surface: #161b26;
+  --border: #262d3d;
+  --text: #e6e9f0;
+  --text-muted: #8b94a8;
+  --accent: #2962ff;
+  --accent-hover: #4d7bff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── 頂部列 ─────────────────────────────── */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  font-size: 20px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.brand span {
+  color: var(--accent);
+}
+
+.symbol-form {
+  flex: 1;
+  display: flex;
+  gap: 8px;
+  max-width: 520px;
+}
+
+.symbol-form input,
+.watchlist-form input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.symbol-form input:focus,
+.watchlist-form input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.symbol-form button,
+.watchlist-form button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.symbol-form button:hover,
+.watchlist-form button:hover {
+  background: var(--accent-hover);
+}
+
+.theme-toggle {
+  margin-left: auto;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* ── 跑馬燈 ─────────────────────────────── */
+.ticker-tape {
+  border-bottom: 1px solid var(--border);
+  min-height: 46px;
+}
+
+/* ── 主要版面 ───────────────────────────── */
+.layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 16px;
+  padding: 16px 20px;
+  align-items: start;
+}
+
+.sidebar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  position: sticky;
+  top: 16px;
+}
+
+.sidebar h2 {
+  font-size: 15px;
+  margin-bottom: 12px;
+  color: var(--text-muted);
+}
+
+.watchlist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.watchlist li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.watchlist li:hover {
+  background: var(--bg);
+}
+
+.watchlist li.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.watchlist li .remove {
+  border: none;
+  background: none;
+  color: inherit;
+  opacity: 0.5;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0 2px;
+}
+
+.watchlist li .remove:hover {
+  opacity: 1;
+}
+
+.watchlist-form {
+  display: flex;
+  gap: 6px;
+}
+
+.watchlist-form button {
+  padding: 8px 12px;
+}
+
+/* ── 內容區 ─────────────────────────────── */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.chart {
+  height: 560px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 420px;
+}
+
+/* ── 分頁 ───────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.tab {
+  padding: 8px 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.tab-panel {
+  display: none;
+  height: 560px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+/* ── TradingView 容器填滿高度 ───────────── */
+.chart .tradingview-widget-container,
+.card .tradingview-widget-container,
+.tab-panel .tradingview-widget-container {
+  height: 100%;
+}
+
+.chart .tradingview-widget-container__widget,
+.tab-panel .tradingview-widget-container__widget {
+  height: 100%;
+}
+
+/* ── 頁尾 ───────────────────────────────── */
+.footer {
+  padding: 14px 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+}
+
+.footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* ── 響應式 ─────────────────────────────── */
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    flex-wrap: wrap;
+  }
+
+  .symbol-form {
+    order: 3;
+    flex-basis: 100%;
+    max-width: none;
+  }
+}

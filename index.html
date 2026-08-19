@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinanceBoard｜TradingView 金融儀表板</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Finance<span>Board</span></div>
+
+    <form id="symbol-form" class="symbol-form" autocomplete="off">
+      <input
+        id="symbol-input"
+        type="text"
+        placeholder="輸入代號，例如 2330、TWSE:2330、AAPL、BINANCE:BTCUSDT"
+        spellcheck="false"
+      />
+      <button type="submit">查詢</button>
+    </form>
+
+    <button id="theme-toggle" class="theme-toggle" type="button" title="切換主題">☀️</button>
+  </header>
+
+  <div id="ticker-tape" class="ticker-tape"></div>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <h2>自選清單</h2>
+      <ul id="watchlist" class="watchlist"></ul>
+      <form id="watchlist-form" class="watchlist-form" autocomplete="off">
+        <input id="watchlist-input" type="text" placeholder="新增代號" spellcheck="false" />
+        <button type="submit">＋</button>
+      </form>
+    </aside>
+
+    <section class="content">
+      <div id="advanced-chart" class="chart"></div>
+
+      <div class="info-grid">
+        <div id="symbol-info" class="card"></div>
+        <div id="technical-analysis" class="card"></div>
+      </div>
+
+      <nav class="tabs" id="tabs">
+        <button class="tab active" data-tab="overview" type="button">市場總覽</button>
+        <button class="tab" data-tab="heatmap" type="button">熱力圖</button>
+        <button class="tab" data-tab="screener" type="button">選股器</button>
+      </nav>
+
+      <div class="tab-panels">
+        <div id="panel-overview" class="tab-panel active"></div>
+        <div id="panel-heatmap" class="tab-panel"></div>
+        <div id="panel-screener" class="tab-panel"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    行情資料與圖表由
+    <a href="https://www.tradingview.com/" target="_blank" rel="noopener">TradingView</a>
+    提供
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
