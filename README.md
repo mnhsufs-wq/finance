@@ -1,65 +1,61 @@
-# FinanceBoard｜TradingView 金融儀表板
+# AI 股票分析｜決策備忘錄
 
-以 [TradingView Embed Widgets](https://www.tradingview.com/widget-docs/) 串接的金融行情儀表板。純靜態網頁（HTML / CSS / 原生 JavaScript），不需要 API key、不需要後端、不需要建置工具，開啟即可使用。
+以「全天候 AI 交易員」的工作邏輯設計的股票分析頁面——輸入代號，系統依
+**研究 → 訊號 → 計畫 → 風險 → 結論** 走完一套流程，最後產出一份決策備忘錄：
+**核准／觀察／拒絕**。AI 負責研究、監控與重複流程，最終決策仍然由人做出。
 
-## 功能
+版面為藍圖海報風格（米色紙張、黑細線框、橘色強調），設計參考
+[denghao.info/0819p](https://www.denghao.info/0819p/)。
 
-- **進階即時圖表**（Advanced Chart）：K 線圖，內建指標、繪圖工具與商品搜尋，時區為 `Asia/Taipei`
-- **行情跑馬燈**（Ticker Tape）：加權指數、S&P 500、台積電、美元/台幣、比特幣、黃金等
-- **商品資訊**（Symbol Info）：目前商品的即時報價摘要
-- **技術分析評級**（Technical Analysis）：多週期的買賣訊號儀表
-- **市場總覽**（Market Overview）：指數／台股／外匯／加密貨幣四個分頁
-- **熱力圖**（Stock Heatmap）：S&P 500 依產業分群的漲跌熱力圖
-- **選股器**（Screener）：台股市場篩選
-- **自選清單**：新增／移除／點擊切換商品，儲存在 `localStorage`
-- **深淺色主題**：一鍵切換，所有 widget 同步換色
-- **台股快捷輸入**：直接輸入 `2330` 會自動視為 `TWSE:2330`
+純靜態網頁（HTML / CSS / 原生 JavaScript），不需要 API key、不需要後端、不需要建置工具。
+
+## 六個頁面
+
+| 頁 | 模組 | 內容 |
+| --- | --- | --- |
+| 1/6 | 輸入 | 代號輸入、快速選擇、系統架構圖 |
+| 2/6 | 01 市場研究 | 報價、走勢圖（收盤價／SMA20／SMA60／進停損目標位）、8 項技術指標 |
+| 3/6 | 02 交易訊號 | 突破／拉回／動能／趨勢延續／反轉 五種型態辨識與評分、訊號摘要五問 |
+| 4/6 | 03 交易計畫 | 進場區間、獲利目標、停損、風報比、持有時間、信心程度、失效條件 |
+| 5/6 | 04 風險管理 | 波動、風報比、停損距離、趨勢一致性、資料品質五項檢查 + 部位試算 |
+| 6/6 | 產出 | 決策印章（核准／觀察／拒絕）、理由、備忘錄摘要 |
 
 ## 使用方式
 
-任何靜態伺服器皆可，例如：
-
 ```bash
-# Python
 python3 -m http.server 8000
-
-# 或 Node.js
+# 或
 npx serve .
 ```
 
-開啟 `http://localhost:8000` 即可。
+開啟 `http://localhost:8000`，輸入代號即可。
 
-> 注意：TradingView widget 以 iframe 載入，直接以 `file://` 開啟檔案在部分瀏覽器可能受限，建議透過 HTTP 伺服器開啟。
+## 支援的代號與資料來源
 
-## 代號格式
+| 輸入範例 | 分類 | 資料來源 |
+| --- | --- | --- |
+| `2330`、`2317` | 台股 | 台灣證交所 OpenAPI（日 K，近 9 個月） |
+| `AAPL`、`NVDA` | 美股 | Stooq 日 K CSV |
+| `BTCUSDT`、`ETHUSDT` | 加密貨幣 | Binance 公開 API（日 K） |
 
-| 輸入範例 | 說明 |
-| --- | --- |
-| `2330` | 常見台股自動對應美國 ADR → `NYSE:TSM`（見下方授權限制） |
-| `AAPL` / `NASDAQ:AAPL` | 美股 |
-| `BINANCE:BTCUSDT` | 加密貨幣 |
-| `FX_IDC:USDTWD` | 外匯 |
-| `TVC:GOLD` | 黃金 |
+資料在**瀏覽器端**直接抓取；若來源無法連線（離線、CORS 或網路限制），會自動改用
+**示範資料**並清楚標示——示範資料由代號種子產生，僅展示流程，不作為任何依據。
 
-> **台股授權限制**：台灣證交所（TWSE）行情資料受交易所授權限制，無法在 TradingView 免費內嵌圖表顯示（會出現「此商品僅在 TradingView 上可用」）。因此常見台股（2330／2303／3711／2412／2317）會自動改用美國 ADR 報價；其他台股代號請直接到 TradingView 網站查看。
+## 分析規則（可在 `js/app.js` 調整）
 
-圖表本身也內建 TradingView 的商品搜尋，點圖表左上角的代號即可搜尋全球商品。
+- 指標：SMA20／SMA60、RSI14、ATR14、MACD 柱狀圖、20 日高低、量比
+- 訊號：五種型態各自以條件組合評分（0–100），取最高分為主訊號
+- 計畫：依訊號型態推導進場區間；停損取近期低點與 1.6×ATR 較緊者；目標至少 2R
+- 風險：任何一項「未通過」即擋下計畫；示範資料一律標示「注意」
+- 結論：無未通過且評分 ≥ 65 → 核准；≥ 50 且未通過 ≤ 1 → 觀察；其餘 → 拒絕
 
 ## 專案結構
 
 ```
 finance/
-├── index.html      # 頁面結構
-├── css/style.css   # 版面與深淺色主題
-└── js/app.js       # widget 建立、狀態管理（自選清單／主題／目前商品）
+├── index.html      # 六張「海報」頁面結構
+├── css/style.css   # 藍圖海報風格版面
+└── js/app.js       # 資料抓取、指標計算、訊號／計畫／風險／結論引擎、SVG 走勢圖
 ```
 
-所有 widget 都由 `js/app.js` 的 `createWidget(containerId, widgetName, config)` 動態注入，設定即 TradingView 官方文件上的 JSON 參數，要調整商品、預設清單或外觀直接改該檔即可。
-
-## 進階整合方向
-
-目前使用的是 TradingView 免費 Embed Widgets（資料由 TradingView 提供並顯示其標示）。若需要更深度的整合，可考慮：
-
-- **Charting Library / Advanced Charts**（需向 TradingView 申請授權）：自帶資料來源（Datafeed API），可完全客製圖表與資料
-- **Webhook 警報**：TradingView 付費方案可將警報以 webhook POST 到自己的後端，實現訊號通知或自動下單
-- **Broker API**：讓 TradingView 圖表直接連你的交易系統下單
+> 本頁由規則式技術分析自動產生，僅供研究參考，不構成投資建議。
