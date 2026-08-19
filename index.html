@@ -1,68 +1,422 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" data-theme="dark">
+<html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FinanceBoard｜TradingView 金融儀表板</title>
+  <title>AI 股票分析｜決策備忘錄</title>
+  <meta name="description" content="輸入股票代號，AI 依「研究 → 訊號 → 計畫 → 風險」四個模組走完整套分析流程，產出一份決策備忘錄——核准、觀察或拒絕，最終決策仍然交給人。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">Finance<span>Board</span></div>
 
-    <form id="symbol-form" class="symbol-form" autocomplete="off">
-      <input
-        id="symbol-input"
-        type="text"
-        placeholder="輸入代號，例如 2330（自動轉台積電 ADR）、AAPL、BINANCE:BTCUSDT"
-        spellcheck="false"
-      />
-      <button type="submit">查詢</button>
-    </form>
+<!-- ══════════ 共用 icon ══════════ -->
+<svg class="defs" aria-hidden="true">
+  <defs>
+    <symbol id="i-search" viewBox="0 0 48 48">
+      <circle cx="20" cy="20" r="11.5"/><path d="M28.5 28.5 39.5 39.5"/>
+    </symbol>
+    <symbol id="i-signal" viewBox="0 0 48 48">
+      <path d="M12 40V32M20 40V27M28 40V31M36 40V23"/>
+      <path d="M10 25 36 10"/><path d="M28.5 9.5H36.5V17.5"/>
+    </symbol>
+    <symbol id="i-shield" viewBox="0 0 48 48">
+      <path d="M24 5 39 10.5V22c0 10.5-6.5 17-15 21-8.5-4-15-10.5-15-21V10.5L24 5Z"/>
+      <path d="M16.5 23.5 22 29 32 16.5"/>
+    </symbol>
+    <symbol id="i-monitor" viewBox="0 0 48 48">
+      <rect x="7" y="9" width="34" height="24" rx="2"/>
+      <path d="M12 21h5l3-6 4 12 3-6h9"/>
+      <path d="M24 33v6M15 41h18"/>
+    </symbol>
+    <symbol id="i-breakout" viewBox="0 0 48 48">
+      <path d="M7 22h5M17 22h5M27 22h5M37 22h5" />
+      <path d="M24 40V10"/><path d="M16.5 17.5 24 10l7.5 7.5"/>
+    </symbol>
+    <symbol id="i-pullback" viewBox="0 0 48 48">
+      <path d="M7 38 20 20l8 9 13-17"/><path d="M28.5 25 28 29l4 .5"/>
+    </symbol>
+    <symbol id="i-bolt" viewBox="0 0 48 48">
+      <path d="M27 5 13 27h9l-3 16 16-24h-10l2-14Z"/>
+    </symbol>
+    <symbol id="i-trend" viewBox="0 0 48 48">
+      <path d="M7 36l10-11 7 6L38 15"/><path d="M31 14.5h7.5V22"/><path d="M7 42h34"/>
+    </symbol>
+    <symbol id="i-reverse" viewBox="0 0 48 48">
+      <path d="M10 17h27"/><path d="M31 10.5 37.5 17 31 23.5"/>
+      <path d="M38 31H11"/><path d="M17 24.5 10.5 31 17 37.5"/>
+    </symbol>
+    <symbol id="i-target" viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="8.5"/><circle cx="24" cy="24" r="1.6" class="fill"/>
+    </symbol>
+    <symbol id="i-stop" viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="16.5"/><path d="M12.5 12.5 35.5 35.5"/>
+    </symbol>
+    <symbol id="i-timer" viewBox="0 0 48 48">
+      <circle cx="24" cy="27" r="14.5"/><path d="M24 27V18M24 27l6.5 4"/><path d="M19.5 6.5h9M24 6.5v6"/>
+    </symbol>
+    <symbol id="i-percent" viewBox="0 0 48 48">
+      <path d="M10 38 38 10"/><circle cx="15" cy="14" r="5"/><circle cx="33" cy="34" r="5"/>
+    </symbol>
+    <symbol id="i-gauge" viewBox="0 0 48 48">
+      <path d="M9 34a15 15 0 1 1 30 0"/><path d="M24 34l8.5-11"/><path d="M9 40h30"/>
+    </symbol>
+    <symbol id="i-alert" viewBox="0 0 48 48">
+      <path d="M24 7 43 40H5L24 7Z"/><path d="M24 19v10"/><circle cx="24" cy="34.5" r="1.4" class="fill"/>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="17"/><path d="M15 24.5 21.5 31 33 17.5"/>
+    </symbol>
+    <symbol id="i-eye" viewBox="0 0 48 48">
+      <path d="M5 24C10 15 17 10.5 24 10.5S38 15 43 24c-5 9-12 13.5-19 13.5S10 33 5 24Z"/>
+      <circle cx="24" cy="24" r="6.5"/>
+    </symbol>
+    <symbol id="i-x" viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="17"/><path d="M17.5 17.5 30.5 30.5M30.5 17.5 17.5 30.5"/>
+    </symbol>
+  </defs>
+</svg>
 
-    <button id="theme-toggle" class="theme-toggle" type="button" title="切換主題">☀️</button>
-  </header>
+<main class="stage">
 
-  <div id="ticker-tape" class="ticker-tape"></div>
+<!-- ══════════ 1/6 輸入 ══════════ -->
+<article class="sheet" id="s-input">
+  <div class="frame" aria-hidden="true"></div>
+  <span class="mark tl"></span><span class="mark bl"></span><span class="mark br"></span>
+  <span class="plus" aria-hidden="true">+</span>
+  <span class="tick tick-l"></span><span class="tick tick-r"></span>
 
-  <main class="layout">
-    <aside class="sidebar">
-      <h2>自選清單</h2>
-      <ul id="watchlist" class="watchlist"></ul>
-      <form id="watchlist-form" class="watchlist-form" autocomplete="off">
-        <input id="watchlist-input" type="text" placeholder="新增代號" spellcheck="false" />
-        <button type="submit">＋</button>
-      </form>
-    </aside>
+  <div class="inner">
+    <header class="meta">
+      <div class="mi"><span class="ml">專案：</span><b class="mv accent">AI 股票分析</b></div>
+      <div class="mi"><span class="ml">模型：</span><b class="mv">FABLE 5</b></div>
+      <div class="mi"><span class="ml">產出：</span><b class="mv accent">決策備忘錄</b></div>
+      <div class="page-no">1/6</div>
+    </header>
 
-    <section class="content">
-      <div id="advanced-chart" class="chart"></div>
+    <section class="hero">
+      <div class="hero-copy">
+        <h1><span class="hl-line">輸入一個代號，</span><br><span class="hl-line">讓 AI 走完整套流程<span class="dot">.</span></span></h1>
+        <div class="h-rule"></div>
+        <p class="lede">研究 → 訊號 → 計畫 → 風險 → 結論，最後整理成一份決策備忘錄。</p>
 
-      <div class="info-grid">
-        <div id="symbol-info" class="card"></div>
-        <div id="technical-analysis" class="card"></div>
+        <form id="analyze-form" class="analyze-form" autocomplete="off">
+          <input id="symbol-input" type="text" placeholder="例如 2330、AAPL、BTCUSDT" spellcheck="false" />
+          <button id="go-btn" type="submit">開始分析</button>
+        </form>
+        <div class="quick">
+          <span class="quick-label">快速選擇</span>
+          <button type="button" data-sym="2330">2330 台積電</button>
+          <button type="button" data-sym="2317">2317 鴻海</button>
+          <button type="button" data-sym="AAPL">AAPL</button>
+          <button type="button" data-sym="NVDA">NVDA</button>
+          <button type="button" data-sym="BTCUSDT">BTCUSDT</button>
+        </div>
+        <p id="fetch-status" class="fetch-status"></p>
       </div>
 
-      <nav class="tabs" id="tabs">
-        <button class="tab active" data-tab="overview" type="button">市場總覽</button>
-        <button class="tab" data-tab="heatmap" type="button">熱力圖</button>
-        <button class="tab" data-tab="screener" type="button">選股器</button>
-      </nav>
-
-      <div class="tab-panels">
-        <div id="panel-overview" class="tab-panel active"></div>
-        <div id="panel-heatmap" class="tab-panel"></div>
-        <div id="panel-screener" class="tab-panel"></div>
+      <div class="hero-diagram">
+        <svg viewBox="0 0 420 530" role="img" aria-label="AI 分析系統架構圖">
+          <g class="d-line">
+            <path d="M95 108V130H165V152"/>
+            <path d="M325 108V130H255V152"/>
+            <path d="M165 376V398H95v24"/>
+            <path d="M255 376V398h70v24"/>
+          </g>
+          <g class="d-node">
+            <rect x="35" y="2" width="120" height="106" rx="7"/>
+            <rect x="265" y="2" width="120" height="106" rx="7"/>
+          </g>
+          <g class="d-icon">
+            <use href="#i-search" x="78" y="22" width="34" height="34"/>
+            <use href="#i-signal" x="308" y="22" width="34" height="34"/>
+          </g>
+          <text class="d-label" x="95" y="92">研究</text>
+          <text class="d-label" x="325" y="92">訊號</text>
+          <g class="d-node">
+            <rect x="85" y="152" width="250" height="224" rx="10"/>
+          </g>
+          <rect class="d-hair" x="93" y="160" width="234" height="208" rx="6"/>
+          <g class="d-dot">
+            <circle cx="100" cy="167" r="1.8"/><circle cx="320" cy="167" r="1.8"/>
+            <circle cx="100" cy="361" r="1.8"/><circle cx="320" cy="361" r="1.8"/>
+          </g>
+          <polygon class="d-hex" points="210,184 238,200 238,232 210,248 182,232 182,200"/>
+          <text class="d-hex-letter" x="210" y="227">F</text>
+          <text class="d-title" x="210" y="292">FABLE 5</text>
+          <text class="d-sub" x="213" y="320">AI 交易員</text>
+          <rect class="d-bar" x="196" y="334" width="28" height="2.5"/>
+          <g class="d-node">
+            <rect x="35" y="422" width="120" height="106" rx="7"/>
+            <rect x="265" y="422" width="120" height="106" rx="7"/>
+          </g>
+          <g class="d-icon">
+            <use href="#i-shield" x="78" y="440" width="34" height="34"/>
+            <use href="#i-monitor" x="308" y="440" width="34" height="34"/>
+          </g>
+          <text class="d-label" x="95" y="510">風險</text>
+          <text class="d-label" x="325" y="510">全天候監控</text>
+          <g class="d-pin">
+            <rect x="92" y="105" width="6" height="6"/><rect x="322" y="105" width="6" height="6"/>
+            <rect x="162" y="149" width="6" height="6"/><rect x="252" y="149" width="6" height="6"/>
+            <rect x="162" y="373" width="6" height="6"/><rect x="252" y="373" width="6" height="6"/>
+            <rect x="92" y="419" width="6" height="6"/><rect x="322" y="419" width="6" height="6"/>
+          </g>
+          <g class="d-dot">
+            <circle cx="43" cy="10" r="1.5"/><circle cx="147" cy="10" r="1.5"/><circle cx="43" cy="100" r="1.5"/><circle cx="147" cy="100" r="1.5"/>
+            <circle cx="273" cy="10" r="1.5"/><circle cx="377" cy="10" r="1.5"/><circle cx="273" cy="100" r="1.5"/><circle cx="377" cy="100" r="1.5"/>
+            <circle cx="43" cy="430" r="1.5"/><circle cx="147" cy="430" r="1.5"/><circle cx="43" cy="520" r="1.5"/><circle cx="147" cy="520" r="1.5"/>
+            <circle cx="273" cy="430" r="1.5"/><circle cx="377" cy="430" r="1.5"/><circle cx="273" cy="520" r="1.5"/><circle cx="377" cy="520" r="1.5"/>
+          </g>
+        </svg>
       </div>
     </section>
-  </main>
 
-  <footer class="footer">
-    行情資料與圖表由
-    <a href="https://www.tradingview.com/" target="_blank" rel="noopener">TradingView</a>
-    提供
-  </footer>
+    <div class="dark-strip">AI 負責研究、監控與重複流程——<b>最終決策仍然由人做出</b>。本頁分析僅供研究參考，不構成投資建議。</div>
+  </div>
+</article>
 
-  <script src="js/app.js"></script>
+<!-- ══════════ 2/6 研究 ══════════ -->
+<article class="sheet" id="s-research">
+  <div class="frame" aria-hidden="true"></div>
+  <span class="mark tl"></span><span class="mark bl"></span><span class="mark br"></span>
+  <span class="plus" aria-hidden="true">+</span>
+  <span class="tick tick-l"></span><span class="tick tick-r"></span>
+
+  <div class="inner">
+    <header class="meta">
+      <div class="mi"><span class="ml">專案：</span><b class="mv accent">AI 股票分析</b></div>
+      <div class="mi"><span class="ml">模型：</span><b class="mv">FABLE 5</b></div>
+      <div class="mi"><span class="ml">模組：</span><b class="mv accent">01 市場研究</b></div>
+      <div class="page-no">2/6</div>
+    </header>
+
+    <section class="sec">
+      <div class="sec-head">
+        <span class="kicker">STEP 01</span>
+        <h1 class="h2">市場研究<span class="dot">.</span></h1>
+        <div class="h-rule"></div>
+      </div>
+
+      <div class="r-head">
+        <div class="r-id">
+          <span id="r-symbol" class="r-symbol">——</span>
+          <span id="r-name" class="r-name"></span>
+        </div>
+        <div class="r-quote">
+          <span id="r-price" class="r-price">—</span>
+          <span id="r-chg" class="r-chg">—</span>
+        </div>
+        <div class="r-meta">
+          <span id="src-badge" class="tag">等待分析</span>
+          <span id="r-date" class="r-date"></span>
+        </div>
+      </div>
+
+      <figure class="chartbox">
+        <div id="chart" class="chart"></div>
+        <figcaption class="chart-legend">
+          <span><i class="lg lg-close"></i>收盤價</span>
+          <span><i class="lg lg-sma20"></i>SMA20</span>
+          <span><i class="lg lg-sma60"></i>SMA60</span>
+          <span><i class="lg lg-entry"></i>進場</span>
+          <span><i class="lg lg-stop"></i>停損</span>
+          <span><i class="lg lg-target"></i>目標</span>
+        </figcaption>
+      </figure>
+
+      <ul class="stat-grid" id="stat-grid">
+        <li><span>20 日高</span><b id="st-hi20">—</b></li>
+        <li><span>20 日低</span><b id="st-lo20">—</b></li>
+        <li><span>SMA20</span><b id="st-sma20">—</b></li>
+        <li><span>SMA60</span><b id="st-sma60">—</b></li>
+        <li><span>RSI 14</span><b id="st-rsi">—</b></li>
+        <li><span>日均波動 ATR%</span><b id="st-atr">—</b></li>
+        <li><span>量比（今日／20 日均量）</span><b id="st-vr">—</b></li>
+        <li><span>距 20 日高</span><b id="st-dhi">—</b></li>
+      </ul>
+    </section>
+  </div>
+</article>
+
+<!-- ══════════ 3/6 訊號 ══════════ -->
+<article class="sheet" id="s-signal">
+  <div class="frame" aria-hidden="true"></div>
+  <span class="mark tl"></span><span class="mark bl"></span><span class="mark br"></span>
+  <span class="plus" aria-hidden="true">+</span>
+  <span class="tick tick-l"></span><span class="tick tick-r"></span>
+
+  <div class="inner">
+    <header class="meta">
+      <div class="mi"><span class="ml">專案：</span><b class="mv accent">AI 股票分析</b></div>
+      <div class="mi"><span class="ml">模型：</span><b class="mv">FABLE 5</b></div>
+      <div class="mi"><span class="ml">模組：</span><b class="mv accent">02 交易訊號</b></div>
+      <div class="page-no">3/6</div>
+    </header>
+
+    <section class="sec">
+      <div class="sec-head">
+        <span class="kicker">STEP 02</span>
+        <h1 class="h2">訊號辨識與評分<span class="dot">.</span></h1>
+        <div class="h-rule"></div>
+      </div>
+
+      <ul class="type-row" id="type-row">
+        <li data-type="breakout"><svg><use href="#i-breakout"/></svg><b>突破</b><span>價格站上關鍵價位</span><em class="t-flag">觸發</em></li>
+        <li data-type="pullback"><svg><use href="#i-pullback"/></svg><b>拉回</b><span>趨勢中的短期回檔</span><em class="t-flag">觸發</em></li>
+        <li data-type="momentum"><svg><use href="#i-bolt"/></svg><b>動能</b><span>價格出現加速</span><em class="t-flag">觸發</em></li>
+        <li data-type="continuation"><svg><use href="#i-trend"/></svg><b>趨勢延續</b><span>原本方向持續成立</span><em class="t-flag">觸發</em></li>
+        <li data-type="reversal"><svg><use href="#i-reverse"/></svg><b>反轉</b><span>結構可能開始改變</span><em class="t-flag">觸發</em></li>
+      </ul>
+
+      <div class="score-strip">
+        <span class="ss-label">訊號評分</span>
+        <span class="ss-item" id="sig-main">—</span>
+        <div class="score-bar"><div id="score-fill" class="score-fill"></div></div>
+        <span class="ss-item" id="sig-score">— / 100</span>
+      </div>
+
+      <div class="check-card">
+        <h3>訊號摘要</h3>
+        <ol class="q-list">
+          <li><b>發現了什麼變化？</b><span id="q1">—</span></li>
+          <li><b>哪些條件已經成立？</b><span id="q2">—</span></li>
+          <li><b>哪些條件仍未確認？</b><span id="q3">—</span></li>
+          <li><b>目前訊號強度如何？</b><span id="q4">—</span></li>
+          <li><b>什麼情況出現時，判斷不再成立？</b><span id="q5">—</span></li>
+        </ol>
+      </div>
+    </section>
+  </div>
+</article>
+
+<!-- ══════════ 4/6 計畫 ══════════ -->
+<article class="sheet" id="s-plan">
+  <div class="frame" aria-hidden="true"></div>
+  <span class="mark tl"></span><span class="mark bl"></span><span class="mark br"></span>
+  <span class="plus" aria-hidden="true">+</span>
+  <span class="tick tick-l"></span><span class="tick tick-r"></span>
+
+  <div class="inner">
+    <header class="meta">
+      <div class="mi"><span class="ml">專案：</span><b class="mv accent">AI 股票分析</b></div>
+      <div class="mi"><span class="ml">模型：</span><b class="mv">FABLE 5</b></div>
+      <div class="mi"><span class="ml">模組：</span><b class="mv accent">03 交易計畫</b></div>
+      <div class="page-no">4/6</div>
+    </header>
+
+    <section class="sec">
+      <div class="sec-head">
+        <span class="kicker">STEP 03</span>
+        <h1 class="h2">交易計畫<span class="dot">.</span></h1>
+        <div class="h-rule"></div>
+        <p class="lede">不是「建議買進」四個字，而是一份可以檢查的完整計畫。</p>
+      </div>
+
+      <ul class="memo-grid">
+        <li><svg><use href="#i-target"/></svg><span>進場區間</span><b id="p-entry">—</b></li>
+        <li><svg><use href="#i-trend"/></svg><span>獲利目標</span><b id="p-target">—</b></li>
+        <li><svg><use href="#i-stop"/></svg><span>停損位置</span><b id="p-stop">—</b></li>
+        <li><svg><use href="#i-percent"/></svg><span>風險報酬比</span><b id="p-rr">—</b></li>
+        <li><svg><use href="#i-timer"/></svg><span>預計持有</span><b id="p-hold">—</b></li>
+        <li><svg><use href="#i-gauge"/></svg><span>信心程度</span><b id="p-conf">—</b></li>
+      </ul>
+
+      <div class="callout">
+        <span class="tag">失效條件</span>
+        <p id="p-invalid">—</p>
+      </div>
+
+      <div class="dark-strip">失效 ≠ 停損：<b>停損</b>是價格到位就退出；<b>失效</b>是進場邏輯已經不成立——事先寫清楚，才不會事後替判斷找理由。</div>
+    </section>
+  </div>
+</article>
+
+<!-- ══════════ 5/6 風險 ══════════ -->
+<article class="sheet" id="s-risk">
+  <div class="frame" aria-hidden="true"></div>
+  <span class="mark tl"></span><span class="mark bl"></span><span class="mark br"></span>
+  <span class="plus" aria-hidden="true">+</span>
+  <span class="tick tick-l"></span><span class="tick tick-r"></span>
+
+  <div class="inner">
+    <header class="meta">
+      <div class="mi"><span class="ml">專案：</span><b class="mv accent">AI 股票分析</b></div>
+      <div class="mi"><span class="ml">模型：</span><b class="mv">FABLE 5</b></div>
+      <div class="mi"><span class="ml">模組：</span><b class="mv accent">04 風險管理</b></div>
+      <div class="page-no">5/6</div>
+    </header>
+
+    <section class="sec">
+      <div class="sec-head">
+        <span class="kicker">STEP 04</span>
+        <h1 class="h2">風險檢查<span class="dot">.</span></h1>
+        <div class="h-rule"></div>
+        <p class="lede">任何一項未通過，計畫就會被擋下——不因訊號很強就放寬規則。</p>
+      </div>
+
+      <ol class="risk-rows" id="risk-rows">
+        <!-- JS 填入 -->
+      </ol>
+
+      <div class="dark-strip" id="pos-strip">部位試算：<b>—</b></div>
+    </section>
+  </div>
+</article>
+
+<!-- ══════════ 6/6 結論 ══════════ -->
+<article class="sheet" id="s-verdict">
+  <div class="frame" aria-hidden="true"></div>
+  <span class="mark tl"></span><span class="mark bl"></span><span class="mark br"></span>
+  <span class="plus" aria-hidden="true">+</span>
+  <span class="tick tick-l"></span><span class="tick tick-r"></span>
+
+  <div class="inner">
+    <header class="meta">
+      <div class="mi"><span class="ml">專案：</span><b class="mv accent">AI 股票分析</b></div>
+      <div class="mi"><span class="ml">模型：</span><b class="mv">FABLE 5</b></div>
+      <div class="mi"><span class="ml">產出：</span><b class="mv accent">決策備忘錄</b></div>
+      <div class="page-no">6/6</div>
+    </header>
+
+    <section class="sec">
+      <div class="sec-head">
+        <h1 class="h2">決策備忘錄<span class="dot">.</span></h1>
+        <div class="h-rule"></div>
+      </div>
+
+      <div class="verdict-wrap">
+        <div id="verdict-stamp" class="verdict-stamp">
+          <svg id="verdict-icon"><use href="#i-eye"/></svg>
+          <span id="verdict-word">觀察</span>
+        </div>
+        <ul class="chip-grid" id="verdict-reasons"></ul>
+      </div>
+
+      <div class="memo-strip">
+        <span class="tag">備忘錄</span>
+        <p id="memo-line">—</p>
+      </div>
+
+      <div class="legend-trio">
+        <div class="lt"><svg><use href="#i-check"/></svg><b>核准</b><span>條件皆符合，交由人確認執行</span></div>
+        <div class="lt"><svg><use href="#i-eye"/></svg><b>觀察</b><span>條件未完全成立，持續監控</span></div>
+        <div class="lt"><svg><use href="#i-x"/></svg><b>拒絕</b><span>訊號不足或風險過高，不執行</span></div>
+      </div>
+
+      <div class="dark-strip">本備忘錄由規則式技術分析自動產生，僅供研究參考，不構成投資建議。<b>最後那個按鈕，仍然由人按下。</b></div>
+    </section>
+  </div>
+</article>
+
+</main>
+
+<footer class="site-foot">
+  版面設計參考 <a href="https://www.denghao.info/0819p/" rel="noopener" target="_blank">denghao.info/0819p</a>
+</footer>
+
+<script src="js/app.js"></script>
 </body>
 </html>
