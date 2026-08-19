@@ -5,20 +5,30 @@
 (function () {
   "use strict";
 
-  var STORAGE_KEY = "financeboard.state";
+  var STORAGE_KEY = "financeboard.state.v2";
   var LOCALE = "zh_TW";
   var TIMEZONE = "Asia/Taipei";
 
+  // TWSE 原始代號受交易所授權限制，無法在免費內嵌圖表顯示，
+  // 常見台股改以美國 ADR 對應
+  var TW_ADR_MAP = {
+    "2330": "NYSE:TSM",   // 台積電
+    "2303": "NYSE:UMC",   // 聯電
+    "3711": "NYSE:ASX",   // 日月光
+    "2412": "NYSE:CHT",   // 中華電信
+    "2317": "OTC:HNHPF"   // 鴻海（美國 OTC）
+  };
+
   var DEFAULT_STATE = {
-    symbol: "TWSE:2330",
+    symbol: "NYSE:TSM",
     theme: "dark",
     watchlist: [
-      "TWSE:2330",
-      "TWSE:2317",
-      "NASDAQ:AAPL",
+      "NYSE:TSM",
       "NASDAQ:NVDA",
+      "NASDAQ:AAPL",
       "BINANCE:BTCUSDT",
-      "TVC:GOLD"
+      "TVC:GOLD",
+      "FX_IDC:USDTWD"
     ]
   };
 
@@ -74,15 +84,16 @@
 
   /**
    * 正規化使用者輸入的代號：
-   * 純數字視為台股（TWSE:xxxx），其餘轉大寫原樣交給 TradingView 解析。
+   * 純數字視為台股——有 ADR 的自動對應（TWSE 資料無法在內嵌圖表顯示），
+   * 其餘轉大寫原樣交給 TradingView 解析。
    */
   function normalizeSymbol(input) {
     var s = input.trim().toUpperCase();
     if (!s) return null;
     if (/^\d{4,6}[A-Z]?$/.test(s)) {
-      return "TWSE:" + s;
+      return TW_ADR_MAP[s] || "TWSE:" + s;
     }
-    return s;
+    return TW_ADR_MAP[s.replace("TWSE:", "")] || s;
   }
 
   /* ── 各區塊 Widget ──────────────────────── */
@@ -90,10 +101,10 @@
   function renderTickerTape() {
     createWidget("ticker-tape", "ticker-tape", {
       symbols: [
-        { proName: "TWSE:IX0001", title: "加權指數" },
         { proName: "FOREXCOM:SPXUSD", title: "S&P 500" },
         { proName: "FOREXCOM:NSXUSD", title: "NASDAQ 100" },
-        { proName: "TWSE:2330", title: "台積電" },
+        { proName: "NYSE:TSM", title: "台積電 ADR" },
+        { proName: "NASDAQ:NVDA", title: "NVIDIA" },
         { proName: "FX_IDC:USDTWD", title: "美元/台幣" },
         { proName: "BINANCE:BTCUSDT", title: "比特幣" },
         { proName: "TVC:GOLD", title: "黃金" }
@@ -165,20 +176,18 @@
             { s: "FOREXCOM:SPXUSD", d: "S&P 500" },
             { s: "FOREXCOM:NSXUSD", d: "NASDAQ 100" },
             { s: "FOREXCOM:DJI", d: "道瓊工業" },
-            { s: "TWSE:IX0001", d: "台灣加權" },
             { s: "INDEX:NKY", d: "日經 225" },
             { s: "INDEX:HSI", d: "恆生指數" }
           ]
         },
         {
-          title: "台股",
+          title: "台股 ADR",
           symbols: [
-            { s: "TWSE:2330", d: "台積電" },
-            { s: "TWSE:2317", d: "鴻海" },
-            { s: "TWSE:2454", d: "聯發科" },
-            { s: "TWSE:2308", d: "台達電" },
-            { s: "TWSE:2382", d: "廣達" },
-            { s: "TWSE:0050", d: "元大台灣50" }
+            { s: "NYSE:TSM", d: "台積電 ADR" },
+            { s: "NYSE:UMC", d: "聯電 ADR" },
+            { s: "NYSE:ASX", d: "日月光 ADR" },
+            { s: "NYSE:CHT", d: "中華電信 ADR" },
+            { s: "OTC:HNHPF", d: "鴻海（美國 OTC）" }
           ]
         },
         {
